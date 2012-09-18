@@ -1,6 +1,6 @@
 {
   "description":  "If you are on a user channel you can click on a video in the list and the site won't change its location; instead it will reload into the current movie player on the top. Works with Flash and HTML5",
-  "name":         "aaaYouTube Stay On Channel",
+  "name":         "YouTube Stay On Channel",
   "version":      "1.0",
 
   "permissions": [

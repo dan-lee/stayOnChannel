@@ -8,25 +8,19 @@
 // @run-at         document-end
 // ==/UserScript==
 
-// @<chrome>
-var port = chrome.extension.connect();
-
-port.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log('onMessage', sendResponse.settingsUpdate);
-});
-
-// @</chrome>
-
 (function(window, undefined) {
   var
     document = window.document,
     videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink'),
+    loadMoreButton = document.querySelector('button.more-videos'),
     len = videoLinks.length,
     index = 0,
     videoPlayer,
     playerOffsetTop,
-    settings,
-    loadMoreButton = document.querySelector('button.more-videos');
+    // <chrome>
+    extensionPort,
+    // </chrome>
+    settings;
 
   initialize();
 
@@ -114,17 +108,25 @@ port.onMessage.addListener(function(request, sender, sendResponse) {
     target.appendChild(scriptElement);
   }
 
+  // <chrome>
   function getSettings() {
-    chrome.extension.sendMessage({ getAllSettings: true }, function(response) {
-      settings = response.value;
+    extensionPort.postMessage({ getAllSettings: true });
+    extensionPort.onMessage.addListener(function(msg) {
+      if (msg.getAllSettings) {
+        settings = msg.getAllSettings;
+        console.log('loaded settings', settings);
+      }
     });
   }
-
+  // </chrome>
 
   function initialize() {
     registerLinkEventListeners();
 
+    // <chrome>
+    extensionPort = chrome.extension.connect();
     getSettings();
+    // </chrome>
 
     // load youtube iframe api which will automatically replace the old video player
     injectJavaScript('//www.youtube.com/iframe_api');

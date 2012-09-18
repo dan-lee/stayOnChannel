@@ -11,14 +11,15 @@ var Settings = {
   init: function() {
     for (var key in this.defaults) {
       if (this.defaults.hasOwnProperty(key)) {
-        this.activeSettings[key] = localStorage[key] || this.defaults[key];
+        this.activeSettings[key] = localStorage.getItem(key) || this.defaults[key];
       }
     }
   },
 
   set: function(key, value) {
     if (this.activeSettings.hasOwnProperty(key)) {
-      localStorage[key] = this.activeSettings[key] = value;
+      this.activeSettings[key] = value
+      localStorage.setItem(key, value);
       return true;
     }
     return false;
@@ -43,41 +44,26 @@ var Settings = {
 };
 Settings.init();
 
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-  var response = false;
-  if (request.getAllSettings) {
-    response = Settings.getAll();
-  } else if (request.set && request.toggle) {
-    response = Settings.toggle(request.set);
-  }
-  sendResponse({ value: response });
-});
-
-var activeTabs = [];
-chrome.extension.onConnect.addListener(function(port) {
-  activeTabs.push(port.tab.id);
-
-  // remove tab id after closing tab
-  port.onDisconnect.addListener(function(port) {
-    var index = activeTabs.indexOf(port.tab.id);
-    if (index != -1) {
-      activeTabs.splice(index, 1);
-    }
+chrome.extension.onConnect.addListener(main);
+// connection to the extension established, process further..
+function main(port) {
+  port.onMessage.addListener(function(msg) {
+    port.postMessage({ getAllSettings: Settings.getAll() });
   });
-});
 
-function toggleStatus() {
-  var iconPath = 'icons/';
-  var iconActive = 'icon19_red.png';
-  var iconInactive = 'icon19_grey.png';
+  chrome.browserAction.onClicked.addListener(toggleStatus);
 
-  if (Settings.toggle('extensionActive')) {
-    var currentIcon = Settings.get('extensionActive') ? iconActive : iconInactive;
-    chrome.browserAction.setIcon({ path: iconPath + currentIcon });
+  function toggleStatus() {
+    var iconPath = 'icons/';
+    var iconActive = 'icon19_red.png';
+    var iconInactive = 'icon19_grey.png';
 
-    for (var i = 0, len = activeTabs.length; i < len; i++) {
-      chrome.tabs.sendRequest(activeTabs[i], { settingsUpdate: Settings.getAll() }, function() {});
+    if (Settings.toggle('extensionActive')) {
+      var currentIcon = Settings.get('extensionActive') ? iconActive : iconInactive;
+      chrome.browserAction.setIcon({ path: iconPath + currentIcon });
+      //chrome.tabs.postMessage({ settingsUpdate: Settings.getAll() }, activeTabs);
+
+      port.postMessage({ getAllSettings: Settings.getAll() });
     }
   }
 }
-chrome.browserAction.onClicked.addListener(toggleStatus);
