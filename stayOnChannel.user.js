@@ -1,13 +1,3 @@
-// ==UserScript==
-// @name           YouTube Stay On Channel
-// @namespace      Agixo
-// @version        1.0
-// @author         Dan Lee <daniellehr@gmx.de>
-// @description    If you are on a user channel you can click on a video in the list and the site won't change its location; instead it will reload into the current movie player on the top. Works with Flash and HTML5
-// @include        *youtube.com/user/*
-// @run-at         document-end
-// ==/UserScript==
-
 (function(window, undefined) {
   var
     document = window.document,
@@ -18,7 +8,7 @@
     videoPlayer,
     playerOffsetTop,
     // <chrome>
-    extensionPort,
+    contentscriptPort,
     // </chrome>
     settings;
 
@@ -108,24 +98,24 @@
     target.appendChild(scriptElement);
   }
 
-  // <chrome>
-  function getSettings() {
-    extensionPort.postMessage({ getAllSettings: true });
-    extensionPort.onMessage.addListener(function(msg) {
-      if (msg.getAllSettings) {
-        settings = msg.getAllSettings;
-        console.log('loaded settings', settings);
-      }
-    });
-  }
-  // </chrome>
-
   function initialize() {
     registerLinkEventListeners();
 
     // <chrome>
-    extensionPort = chrome.extension.connect();
-    getSettings();
+    // request settings
+    var port = chrome.extension.connect();
+
+    chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+      if (request.getAllSettings) {
+        settings = request.getAllSettings;
+        console.log('Received settings', settings);
+      }
+    });
+
+    console.log('Request settings');
+    chrome.extension.sendMessage({ getAllSettings: true }, function(response) {
+      console.log('callback (received settings should appear in console!)');
+    });
     // </chrome>
 
     // load youtube iframe api which will automatically replace the old video player
