@@ -1,4 +1,4 @@
-(function(window, undefined) {
+(function() {
   var
     document = window.document,
     videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink'),
@@ -159,4 +159,4 @@
     }, 150);
   }
   initialize();
-})(window, undefined);
+})();

@@ -18,7 +18,7 @@
       "https://*.youtube.com/user*",
       "https://youtube.com/user*"
     ],
-    "js":     ["stayOnChannel.user.js"],
+    "js":     ["stayOnChannel.js"],
     "run_at": "document_end"
   }],
 
