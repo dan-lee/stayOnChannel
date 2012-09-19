@@ -7,12 +7,30 @@
     index = 0,
     videoPlayer,
     playerOffsetTop,
-    // <chrome>
-    contentscriptPort,
-    // </chrome>
     settings;
 
-  initialize();
+  var communicator = (function() {
+    // let the background know that the content script is alive
+    var port = chrome.extension.connect();
+
+    // public
+    return {
+      request: function(message, callback) {
+        chrome.extension.sendMessage(message, function(response) {
+          callback(response);
+        });
+      },
+
+      on: function(event, callback) {
+        chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+          if (request.event == event) {
+            callback(request.message);
+            sendResponse && sendResponse(request.message);
+          }
+        });
+      }
+    }
+  })();
 
   function registerLinkEventListeners() {
     for(;index < len; index++) {
@@ -48,13 +66,13 @@
     tempDiv.className = videoPlayer.className;
     videoPlayer.parentNode.replaceChild(tempDiv, videoPlayer);
 
-    var javascriptCode =
-      'new YT.Player("'+videoPlayer.id+'", {' +
-      '  videoId: "'+videoId+'",' +
-      '  events: {' +
-      (settings.autoPlay ? 'onReady: function(e) { e.target.playVideo(); }' : '') +
-      '  }' +
-      '});';
+    var javascriptCode = [
+      'new YT.Player("'+videoPlayer.id+'", {',
+      '  videoId: "'+videoId+'",',
+      '  events: {',
+      (settings.autoPlay ? 'onReady: function(e) { e.target.playVideo(); }' : ''),
+      '  }',
+      '});'].join('');
 
     injectJavaScript(null, javascriptCode);
   }
@@ -98,23 +116,17 @@
     target.appendChild(scriptElement);
   }
 
+  communicator.on('refreshSettings', function(response) {
+    console.log('refreshed settings', response);
+    settings = response;
+  });
+
   function initialize() {
     registerLinkEventListeners();
 
     // <chrome>
-    // request settings
-    var port = chrome.extension.connect();
-
-    chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-      if (request.getAllSettings) {
-        settings = request.getAllSettings;
-        console.log('Received settings', settings);
-      }
-    });
-
-    console.log('Request settings');
-    chrome.extension.sendMessage({ getAllSettings: true }, function(response) {
-      console.log('callback (received settings should appear in console!)');
+    communicator.request('allSettings', function(remoteSettings) {
+      settings = remoteSettings;
     });
     // </chrome>
 
@@ -146,4 +158,5 @@
       }
     }, 150);
   }
+  initialize();
 })(window, undefined);

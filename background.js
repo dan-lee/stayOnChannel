@@ -23,9 +23,9 @@ var settings = (function(localStorage) {
     },
 
     toggle: function(key) {
-      var oldValue = get(key);
+      var oldValue = this.get(key);
       if (typeof oldValue == 'boolean') {
-        return set(key, !(oldValue));
+        return this.set(key, !(oldValue));
       } else throw(key + ' setting is not boolean.');
     },
 
@@ -41,7 +41,7 @@ var settings = (function(localStorage) {
   };
 })(localStorage);
 
-/*var extensionIO = (function() {
+var communicator = (function() {
   var channelTabs = [];
 
   chrome.extension.onConnect.addListener(function(port) {
@@ -58,58 +58,28 @@ var settings = (function(localStorage) {
   });
 
   return {
-    send: function(callback) {
+    notify: function(event, message, callback) {
+      var notification = { event: event, message: message  };
       for(var i = 0, len = channelTabs.length; i < len; i++) {
-        chrome.tabs.sendMessage(channelTabs[i], msg, function() {
-          callback && callback();
-        });
+        chrome.tabs.sendMessage(channelTabs[i], notification, callback);
       }
     },
 
-    on: function(what, callback) {
-      var that;
+    on: function(event, callback) {
       chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.hasOwnProperty(what)) {
-          callback.call(that);
+        if (request == event) {
+          sendResponse(callback());
         }
       });
     }
   };
-})();*/
+})();
 
-extensionIO.on('getAllSettings', function() {
-  //this.send({ getAllSettings: settings.getAll() });
-  extensionIO.send({ getAllSettings: settings.getAll() });
+communicator.on('allSettings', function() {
+  return settings.getAll();
 });
 
-var tabs = [];
-chrome.extension.onConnect.addListener(function(port) {
-  var id = port.tab.id;
-  if (tabs.indexOf(id) == -1) {
-    tabs.push(id);
-  }
-  port.onDisconnect.addListener(function() {
-    tabs.splice(tabs.indexOf(id), 1);
-  });
-});
-
-
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.getAllSettings) {
-    sendMessage({ getAllSettings: settings.getAll() });
-  }
-});
-
-function sendMessage(msg) {
-  for(var i = 0, len = tabs.length; i < len; i++) {
-    chrome.tabs.sendMessage(tabs[i], msg, function() {});
-  }
-}
-
-
-chrome.browserAction.onClicked.addListener(toggleStatus);
-
-function toggleStatus() {
+chrome.browserAction.onClicked.addListener(function() {
   var iconPath = 'icons/';
   var iconActive = 'icon19_red.png';
   var iconInactive = 'icon19_grey.png';
@@ -118,7 +88,6 @@ function toggleStatus() {
     var currentIcon = settings.get('extensionActive') ? iconActive : iconInactive;
     chrome.browserAction.setIcon({ path: iconPath + currentIcon });
 
-    sendMessage({ getAllSettings: settings.getAll() });
-    //extensionIO.sendMessage({ getAllSettings: Settings.getAll() });
+    communicator.notify('refreshSettings', settings.getAll());
   }
-}
+});
