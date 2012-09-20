@@ -1,7 +1,13 @@
 (function() {
-  var videoLinks, videoPlayer,
-      len, index = 0, settings,
-      playerOffsetTop;
+  var
+    document = window.document,
+    videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink'),
+    loadMoreButton = document.querySelector('button.more-videos'),
+    len = videoLinks.length,
+    index = 0,
+    videoPlayer,
+    playerOffsetTop,
+    settings;
 
   // may be called multiple times (after "Load more" button is clicked)
   function registerLinkEventListeners() {
@@ -75,17 +81,18 @@
     // will set the videoPlayer for the first time
     whenVideoPlayerIsAvailable(function() {
       console.log('"Stay on channel" started', truth(settings.extensionActive, '[inactive]'));
+
+      playerOffsetTop = (function() {
+        var offsetTop = 0, current = videoPlayer;
+        do {
+          offsetTop += current.offsetTop;
+        } while(current = current.offsetParent);
+
+        // jump a bit above for the good feeling
+        return offsetTop - 20;
+      })();
     });
 
-    playerOffsetTop = (function() {
-      var offsetTop = 0, current = videoPlayer;
-      do {
-        offsetTop += current.offsetTop;
-      } while(current = current.offsetParent);
-
-      // jump a bit above for the good feeling
-      return offsetTop - 20;
-    })();
 
     // append event listeners when more videos are loaded
     document.querySelector('button.more-videos').addEventListener('click', function() {
