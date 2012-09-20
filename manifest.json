@@ -18,7 +18,11 @@
       "https://*.youtube.com/user*",
       "https://youtube.com/user*"
     ],
-    "js":     ["stayOnChannel.js"],
+    "js": [
+      "src/globals.js",
+      "src/communicator.js",
+      "src/stayOnChannel.js"
+    ],
     "run_at": "document_end"
   }],
 
@@ -34,6 +38,5 @@
   "browser_action": {
     "default_icon":  "icons/icon19_red.png",
     "default_title": "YouTube Stay On Channel"
-  },
-  "converted_from_user_script": true
+  }
 }

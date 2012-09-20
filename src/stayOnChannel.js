@@ -9,29 +9,6 @@
     playerOffsetTop,
     settings;
 
-  var communicator = (function() {
-    // let the background know that the content script is alive
-    var port = chrome.extension.connect();
-
-    // public
-    return {
-      request: function(message, callback) {
-        chrome.extension.sendMessage(message, function(response) {
-          callback(response);
-        });
-      },
-
-      on: function(event, callback) {
-        chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-          if (request.event == event) {
-            callback(request.message);
-            sendResponse && sendResponse(request.message);
-          }
-        });
-      }
-    }
-  })();
-
   function registerLinkEventListeners() {
     for(;index < len; index++) {
       addListeners(videoLinks[index]);
@@ -41,7 +18,7 @@
   function addListeners(element) {
     element.addEventListener('click', replaceVideoContainer);
 
-    // double clicks will redirect to the video page
+    // right click will redirect to the video page
     element.addEventListener('contextmenu', redirectToVideo);
   }
 
@@ -49,7 +26,7 @@
     if (settings.extensionActive) {
       e.preventDefault();
       var href = this.href;
-      // don't jump hashes to the anchor, but use scrollTo
+      // don't jump to anchors, use scrollTo and absolute positions instead (looks cleaner, doesn't change url)
       jumpToVideoPlayer();
 
       whenVideoPlayerIsAvailable(function() {
@@ -59,7 +36,7 @@
   }
 
   function replaceVideoPlayer(url) {
-    var videoId = getParameterByName('v', parseUrl(url));
+    var videoId = getQueryParam('v', url);
 
     var tempDiv = document.createElement('div');
     tempDiv.id = videoPlayer.id;
@@ -78,7 +55,9 @@
   }
 
   function redirectToVideo(e) {
-    settings.rightClickRedirect && e.preventDefault() && (window.location = this.href);
+    // Yay! Found a place where I can actually implement this
+    // http://javascriptweblog.wordpress.com/2011/04/04/the-javascript-comma-operator/
+    settings.rightClickRedirect && (e.preventDefault(), window.location = this.href);
   }
 
   function jumpToVideoPlayer() {
@@ -92,28 +71,6 @@
       playerOffsetTop = offsetTop - 20;
     }
     settings.jumpToPlayer && window.scrollTo(0, playerOffsetTop);
-  }
-
-  function getParameterByName(name, location) {
-    var match = new RegExp('[?&]' + name + '=([^&]*)').exec(location);
-    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-  }
-
-  function parseUrl(urlString) {
-    var a = document.createElement('a');
-    a.href = urlString;
-    return a;
-  }
-
-  function injectJavaScript(src, textContent) {
-    var scriptElement = document.createElement('script');
-    if (!!src) {
-      scriptElement.src = src;
-    } else if (!!textContent) {
-      scriptElement.textContent = textContent;
-    }
-    var target = document.getElementsByTagName('head')[0] || document.body || document.documentElement;
-    target.appendChild(scriptElement);
   }
 
   communicator.on('refreshSettings', function(response) {
@@ -133,7 +90,9 @@
     // load youtube iframe api which will automatically replace the old video player
     injectJavaScript('//www.youtube.com/iframe_api');
     // will set the videoPlayer for the first time
-    whenVideoPlayerIsAvailable();
+    whenVideoPlayerIsAvailable(function() {
+      console.log('"Stay on channel" started', truth(settings.extensionActive, '[inactive]'));
+    });
 
     // append event listeners when more videos are loaded
     loadMoreButton.addEventListener('click', function() {
