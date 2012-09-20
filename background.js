@@ -8,7 +8,9 @@ var settings = (function(localStorage) {
 
   for (var key in defaults) {
     if (defaults.hasOwnProperty(key)) {
-      activeSettings[key] = localStorage.getItem(key) || defaults[key];
+      var val = localStorage.getItem(key);
+      activeSettings[key] = val !== null ? JSON.parse(val) : defaults[key];
+      console.log('Setting "',key,'" is set to "',activeSettings[key],'"');
     }
   }
 
@@ -16,7 +18,8 @@ var settings = (function(localStorage) {
     set: function(key, value) {
       if (activeSettings.hasOwnProperty(key)) {
         activeSettings[key] = value;
-        localStorage.setItem(key, value);
+        console.log('Setting "',key,'" to ',JSON.stringify(value));
+        localStorage.setItem(key, JSON.stringify(value));
         return true;
       }
       return false;
@@ -79,14 +82,19 @@ communicator.on('allSettings', function() {
   return settings.getAll();
 });
 
-chrome.browserAction.onClicked.addListener(function() {
-  var iconPath = 'icons/';
-  var iconActive = 'icon19_red.png';
-  var iconInactive = 'icon19_grey.png';
+var iconPath = 'icons/';
+var iconActive = 'icon19_red.png';
+var iconInactive = 'icon19_grey.png';
 
+var currentIcon = settings.get('extensionActive') ? iconActive : iconInactive;
+chrome.browserAction.setIcon({ path: iconPath + currentIcon });
+console.log('set icon to '+currentIcon, settings.get('extensionActive'));
+
+chrome.browserAction.onClicked.addListener(function() {
   if (settings.toggle('extensionActive')) {
     var currentIcon = settings.get('extensionActive') ? iconActive : iconInactive;
     chrome.browserAction.setIcon({ path: iconPath + currentIcon });
+    console.log('set icon to '+currentIcon, settings.get('extensionActive'));
 
     communicator.notify('refreshSettings', settings.getAll());
   }
