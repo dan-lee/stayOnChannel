@@ -1,14 +1,8 @@
 (function() {
-  var
-    document = window.document,
-    videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink'),
-    loadMoreButton = document.querySelector('button.more-videos'),
-    len = videoLinks.length,
-    index = 0,
-    videoPlayer,
-    playerOffsetTop,
-    settings;
+  var videoLinks, videoPlayer,
+      len, index = 0, settings;
 
+  // may be called multiple times (after "Load more" button is clicked)
   function registerLinkEventListeners() {
     for(;index < len; index++) {
       addListeners(videoLinks[index]);
@@ -40,14 +34,13 @@
 
     var tempDiv = document.createElement('div');
     tempDiv.id = videoPlayer.id;
-    tempDiv.className = videoPlayer.className;
     videoPlayer.parentNode.replaceChild(tempDiv, videoPlayer);
 
     var javascriptCode = [
       'new YT.Player("'+videoPlayer.id+'", {',
       '  videoId: "'+videoId+'",',
       '  events: {',
-      (settings.autoPlay ? 'onReady: function(e) { e.target.playVideo(); }' : ''),
+      truth(settings.autoPlay, 'onReady: function(e) { e.target.playVideo(); }'),
       '  }',
       '});'].join('');
 
@@ -61,15 +54,6 @@
   }
 
   function jumpToVideoPlayer() {
-    // only calculate once, the player will stay at the same position
-    if (!playerOffsetTop) {
-      var offsetTop = 0, current = videoPlayer;
-      do {
-        offsetTop += current.offsetTop;
-      } while(current = current.offsetParent);
-      // jump a bit above for the good feeling
-      playerOffsetTop = offsetTop - 20;
-    }
     settings.jumpToPlayer && window.scrollTo(0, playerOffsetTop);
   }
 
@@ -81,11 +65,9 @@
   function initialize() {
     registerLinkEventListeners();
 
-    // <chrome>
     communicator.request('allSettings', function(remoteSettings) {
       settings = remoteSettings;
     });
-    // </chrome>
 
     // load youtube iframe api which will automatically replace the old video player
     injectJavaScript('//www.youtube.com/iframe_api');
@@ -94,8 +76,18 @@
       console.log('"Stay on channel" started', truth(settings.extensionActive, '[inactive]'));
     });
 
+    var playerOffsetTop = (function() {
+      var offsetTop = 0, current = videoPlayer;
+      do {
+        offsetTop += current.offsetTop;
+      } while(current = current.offsetParent);
+
+      // jump a bit above for the good feeling
+      return offsetTop - 20;
+    })();
+
     // append event listeners when more videos are loaded
-    loadMoreButton.addEventListener('click', function() {
+    document.querySelector('button.more-videos').addEventListener('click', function() {
       var checkLinkInterval = window.setInterval(function() {
         videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink');
         if ((len = videoLinks.length) > index) {
