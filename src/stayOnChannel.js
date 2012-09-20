@@ -1,6 +1,7 @@
 (function() {
   var videoLinks, videoPlayer,
-      len, index = 0, settings;
+      len, index = 0, settings,
+      playerOffsetTop;
 
   // may be called multiple times (after "Load more" button is clicked)
   function registerLinkEventListeners() {
@@ -37,8 +38,8 @@
     videoPlayer.parentNode.replaceChild(tempDiv, videoPlayer);
 
     var javascriptCode = [
-      'new YT.Player("'+videoPlayer.id+'", {',
-      '  videoId: "'+videoId+'",',
+      'new YT.Player("',videoPlayer.id,'", {',
+      '  videoId: "',videoId,'",',
       '  events: {',
       truth(settings.autoPlay, 'onReady: function(e) { e.target.playVideo(); }'),
       '  }',
@@ -76,7 +77,7 @@
       console.log('"Stay on channel" started', truth(settings.extensionActive, '[inactive]'));
     });
 
-    var playerOffsetTop = (function() {
+    playerOffsetTop = (function() {
       var offsetTop = 0, current = videoPlayer;
       do {
         offsetTop += current.offsetTop;
