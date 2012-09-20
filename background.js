@@ -83,19 +83,19 @@ communicator.on('allSettings', function() {
 });
 
 var iconPath = 'icons/';
-var iconActive = 'icon19_red.png';
-var iconInactive = 'icon19_grey.png';
+var toggleIcons = ['icon19_grey.png', 'icon19_red.png'];
 
-var currentIcon = settings.get('extensionActive') ? iconActive : iconInactive;
-chrome.browserAction.setIcon({ path: iconPath + currentIcon });
-console.log('set icon to '+currentIcon, settings.get('extensionActive'));
+var getCurrentIcon = function() {
+  // neat trick, preceeding '+' converts bool to int. this represents the index in toggleIcons
+  var icon = toggleIcons[+(settings.get('extensionActive'))];
+  return iconPath + icon;
+};
+
+chrome.browserAction.setIcon({ path: getCurrentIcon() });
 
 chrome.browserAction.onClicked.addListener(function() {
   if (settings.toggle('extensionActive')) {
-    var currentIcon = settings.get('extensionActive') ? iconActive : iconInactive;
-    chrome.browserAction.setIcon({ path: iconPath + currentIcon });
-    console.log('set icon to '+currentIcon, settings.get('extensionActive'));
-
+    chrome.browserAction.setIcon({ path: getCurrentIcon() });
     communicator.notify('refreshSettings', settings.getAll());
   }
 });
