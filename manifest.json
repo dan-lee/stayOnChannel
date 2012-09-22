@@ -1,22 +1,17 @@
 {
-  "description": "If you are on a user channel you can click on a video in the list and the site won't change its location; instead it will reload into the current movie player on the top. Works with Flash and HTML5",
+  "description": "When clicking on a video on any featured channel,the video will be loaded into the \"featured video\" player at the top.",
   "name":        "YouTube Stay On Channel",
   "version":     "1.0",
-
+  "manifest_version": 2,
   "permissions": [
     "tabs",
-    "http://*.youtube.com/user*",
-    "http://youtube.com/user*",
-    "https://*.youtube.com/user*",
-    "https://youtube.com/user*"
+    "*://*.youtube.com/user*",
+    "*://youtube.com/user*"
   ],
-
   "content_scripts": [{
     "matches": [
-      "http://*.youtube.com/user*",
-      "http://youtube.com/user*",
-      "https://*.youtube.com/user*",
-      "https://youtube.com/user*"
+      "*://*.youtube.com/user*",
+      "*://youtube.com/user*"
     ],
     "js": [
       "src/globals.js",
@@ -25,16 +20,13 @@
     ],
     "run_at": "document_end"
   }],
-
   "background": {
     "scripts": ["background.js"]
   },
-
   "icons": {
     "48":  "icons/icon48_red.png",
     "128": "icons/icon128_red.png"
   },
-
   "browser_action": {
     "default_icon":  "icons/icon19_red.png",
     "default_title": "YouTube Stay On Channel"

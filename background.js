@@ -3,14 +3,14 @@ var settings = (function(localStorage) {
     extensionActive: true,
     autoPlay: true,
     jumpToPlayer: true,
-    rightClickRedirect: true
+    rightClickRedirect: false
   }, activeSettings = {};
 
   for (var key in defaults) {
     if (defaults.hasOwnProperty(key)) {
       var val = localStorage.getItem(key);
       activeSettings[key] = val !== null ? JSON.parse(val) : defaults[key];
-      console.log('Setting "',key,'" is set to "',activeSettings[key],'"');
+      console.log('Setting "'+key+'" is set to "'+activeSettings[key]+'"');
     }
   }
 
@@ -18,7 +18,7 @@ var settings = (function(localStorage) {
     set: function(key, value) {
       if (activeSettings.hasOwnProperty(key)) {
         activeSettings[key] = value;
-        console.log('Setting "',key,'" to ',JSON.stringify(value));
+        console.log('Setting "'+key+'" to '+JSON.stringify(value));
         localStorage.setItem(key, JSON.stringify(value));
         return true;
       }
@@ -29,13 +29,13 @@ var settings = (function(localStorage) {
       var oldValue = this.get(key);
       if (typeof oldValue == 'boolean') {
         return this.set(key, !(oldValue));
-      } else throw(key + ' setting is not boolean.');
+      } else throw('Setting "'+key+'" is not boolean.');
     },
 
     get: function(key) {
       if (activeSettings.hasOwnProperty(key)) {
         return activeSettings[key];
-      } else throw('Could not get setting '+key);
+      } else throw('Could not get setting "'+key+'"');
     },
 
     getAll: function() {
@@ -86,7 +86,7 @@ var iconPath = 'icons/';
 var toggleIcons = ['icon19_grey.png', 'icon19_red.png'];
 
 var getCurrentIcon = function() {
-  // neat trick, preceeding '+' converts bool to int. this represents the index in toggleIcons
+  // neat trick: preceeding '+' converts bool to int. this represents the index in toggleIcons
   var icon = toggleIcons[+(settings.get('extensionActive'))];
   return iconPath + icon;
 };
