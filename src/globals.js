@@ -1,6 +1,5 @@
-function truth(assert, returnValue, strict) {
-  strict = strict || true;
-  return ((strict && assert === true) || (!strict && assert == true)) && returnValue || '';
+function truth(assert, returnValue) {
+  return assert == true && returnValue || '';
 }
 
 function getParameterByName(name, location) {
