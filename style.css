@@ -1,0 +1,13 @@
+.soc_zoom {
+  cursor: pointer;
+  padding: 0 3px;
+}
+
+.soc_zoom:hover {
+  -webkit-filter: sepia(1);
+}
+
+.soc_zoom.disabled {
+  cursor: default;
+  -webkit-filter: contrast(.5);
+}
