@@ -48,7 +48,7 @@ var communicator = (function() {
   var channelTabs = [];
 
   chrome.extension.onConnect.addListener(function(port) {
-    var tabId = port.tab.id;
+    var tabId = port.tab.id || port.sender.tab.id;
     // add tab when opened
     if (channelTabs.indexOf(tabId) == -1) {
       channelTabs.push(tabId);

@@ -1,7 +1,7 @@
 {
   "description": "When clicking on a video on any featured channel,the video will be loaded into the \"featured video\" player at the top.",
   "name":        "YouTube™ Stay On Channel",
-  "version":     "1.0",
+  "version":     "1.1",
   "manifest_version": 2,
   "permissions": [
     "tabs",
@@ -17,6 +17,9 @@
       "src/globals.js",
       "src/communicator.js",
       "src/stayOnChannel.js"
+    ],
+    "css": [
+      "style.css"
     ],
     "run_at": "document_end"
   }],
