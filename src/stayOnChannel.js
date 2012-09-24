@@ -166,6 +166,8 @@
     communicator.request('allSettings', function(remoteSettings) {
       settings = remoteSettings;
       console.log('"YouTube Stay on channel" started', truth(!settings.extensionActive, '[inactive]'));
+
+      settings.extendPlaylist && extendPlaylist();
     });
 
     videoPlayer.init();
@@ -176,8 +178,6 @@
     // and finally register event listeners to all found video links on the channel
     linklistLength = videoLinks.length;
     registerLinkEventListeners();
-
-    settings.extendPlaylist && extendPlaylist();
   }
 
   function getVideoLinks() {

@@ -23,17 +23,19 @@ function doGetRequest(url, callback) {
 }
 
 function getVideoInfo(videoId, callback) {
-  var apiVideoUrl = 'https://gdata.youtube.com/feeds/api/videos/'+videoId+'?v=2&alt=jsonc';
+  // unfortunately the more verbose 'json', instead of 'jsonc' is needed to get the correct cased user name
+  // ('jsonc' forces the user name to lower case)
+  var apiVideoUrl = 'https://gdata.youtube.com/feeds/api/videos/'+videoId+'?v=2&alt=json';
 
   doGetRequest(apiVideoUrl, function(response) {
-    response = JSON.parse(response).data;
+    response = JSON.parse(response).entry;
 
     callback({
       videoId: videoId,
-      title: response.title,
-      views: Number(response.viewCount).separateThousandth(),
-      creator: 'by '+response.uploader,
-      created: prettyDate(response.uploaded)
+      title: response['title']['$t'],
+      views: Number(response['yt$statistics']['viewCount']).separateThousandth(),
+      creator: 'by '+response['author'][0]['name']['$t'],
+      created: prettyDate(response['published']['$t'])
     });
   });
 }
