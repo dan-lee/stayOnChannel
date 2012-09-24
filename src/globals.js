@@ -7,8 +7,8 @@ function getParameterByName(name, location) {
   return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
-Number.prototype.separateThousandth = function() {
-  return this.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+String.prototype.separateThousandth = function() {
+  return this.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
 function doGetRequest(url, callback) {
@@ -33,7 +33,7 @@ function getVideoInfo(videoId, callback) {
     callback({
       videoId: videoId,
       title: response['title']['$t'],
-      views: Number(response['yt$statistics']['viewCount']).separateThousandth(),
+      views: response['yt$statistics']['viewCount'].separateThousandth(),
       creator: 'by '+response['author'][0]['name']['$t'],
       created: prettyDate(response['published']['$t'])
     });

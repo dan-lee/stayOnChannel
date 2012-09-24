@@ -193,7 +193,7 @@
   }
 
   function registerLoadMoreButton() {
-    var loadMoreButton = document.querySelector('button.more-videos');
+    var loadMoreButton = document.querySelector('button.more-videos, button.load-more-button');
     loadMoreButton && loadMoreButton.addEventListener('click', function() {
       var checkLinkInterval = window.setInterval(function() {
         videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink');
