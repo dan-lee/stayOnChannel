@@ -1,4 +1,4 @@
-communicator = (function() {
+var communicator = (function() {
   // let the background know that the content script is alive
   var port = chrome.extension.connect();
 
@@ -13,7 +13,7 @@ communicator = (function() {
     on: function(event, callback) {
       chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         if (request.event == event) {
-          callback(request.message);
+          callback.call(this, request.message);
           sendResponse && sendResponse(request.message);
         }
       });

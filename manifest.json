@@ -5,22 +5,20 @@
   "manifest_version": 2,
   "permissions": [
     "tabs",
-    "*://*.youtube.com/user*",
-    "*://youtube.com/user*"
+    "*://*.youtube.com/*",
+    "*://youtube.com/*"
   ],
   "content_scripts": [{
     "matches": [
-      "*://*.youtube.com/user*",
-      "*://youtube.com/user*"
+      "*://*.youtube.com/*",
+      "*://youtube.com/*"
     ],
     "js": [
       "src/globals.js",
       "src/communicator.js",
       "src/stayOnChannel.js"
     ],
-    "css": [
-      "style.css"
-    ],
+    "css": ["style.css"],
     "run_at": "document_end"
   }],
   "background": {
