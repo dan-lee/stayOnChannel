@@ -3,6 +3,12 @@
   padding: 0 3px;
 }
 
+div.channels-featured-video.soc_channel-module {
+  margin: 0;
+  padding: 0;
+  margin-left: -8px;
+}
+
 .soc_zoom:hover {
   -webkit-filter: sepia(1);
 }

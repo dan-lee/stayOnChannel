@@ -3,7 +3,8 @@ var settings = (function(localStorage) {
     extensionActive: true,
     autoPlay: true,
     jumpToPlayer: true,
-    rightClickRedirect: false
+    rightClickRedirect: false,
+    extendPlaylist: true
   }, activeSettings = {};
 
   for (var key in defaults) {
@@ -80,6 +81,7 @@ var communicator = (function() {
   };
 })();
 
+// settings were request by content script. now deliver!
 communicator.on('allSettings', function() {
   return settings.getAll();
 });

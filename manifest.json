@@ -16,6 +16,7 @@
     "js": [
       "src/globals.js",
       "src/communicator.js",
+      "src/playerTemplate.js",
       "src/stayOnChannel.js"
     ],
     "css": ["style.css"],
