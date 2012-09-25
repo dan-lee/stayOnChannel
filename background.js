@@ -3,8 +3,8 @@ var settings = (function(localStorage) {
     extensionActive: true,
     autoPlay: true,
     jumpToPlayer: true,
-    rightClickRedirect: false,
-    extendPlaylist: true
+    rightClickRedirect: false
+    //extendPlaylist: true
   }, activeSettings = {};
 
   for (var key in defaults) {
@@ -49,8 +49,6 @@ var communicator = (function() {
   var channelTabs = [];
 
   chrome.extension.onConnect.addListener(function(port) {
-    console.log(port);
-
     var tabId = port.sender.tab.id;
     // add tab when opened
     if (channelTabs.indexOf(tabId) == -1) {
@@ -86,20 +84,19 @@ communicator.on('allSettings', function() {
   return settings.getAll();
 });
 
-var iconPath = 'icons/';
 var toggleIcons = ['icon19_grey.png', 'icon19_red.png'];
+var getCurrentIcon = function(toggle) {
+  // if param toggle is true
+  toggle && settings.toggle('extensionActive');
 
-var getCurrentIcon = function() {
   // neat trick: preceeding '+' converts bool to int. this represents the index in toggleIcons
-  var icon = toggleIcons[+(settings.get('extensionActive'))];
-  return iconPath + icon;
+  var icon = toggleIcons[+settings.get('extensionActive')];
+  return 'icons/' + icon;
 };
 
 chrome.browserAction.setIcon({ path: getCurrentIcon() });
 
 chrome.browserAction.onClicked.addListener(function() {
-  if (settings.toggle('extensionActive')) {
-    chrome.browserAction.setIcon({ path: getCurrentIcon() });
-    communicator.notify('refreshSettings', settings.getAll());
-  }
+  chrome.browserAction.setIcon({ path: getCurrentIcon(true) });
+  communicator.notify('refreshSettings', settings.getAll());
 });
