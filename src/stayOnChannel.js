@@ -22,9 +22,10 @@
 
       getVideoInfo(videoId, function(info) {
         // append it after horizontal ruler in the feed
-        document
-          .querySelector('.yt-horizontal-rule.channel-section-hr')
-          .outerHTML += playerTemplate.get(info);
+        var appendTo = document.querySelector('.yt-horizontal-rule.channel-section-hr, .playlist-info');
+        var extraMargin = !appendTo.classList.contains('playlist-info');
+
+        appendTo.outerHTML += playerTemplate.get(info, extraMargin);
 
         this.player = document.getElementById(playerTemplate.id);
         this.calculateOffset();

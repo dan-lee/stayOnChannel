@@ -2,7 +2,7 @@ var playerTemplate = {
   id: 'movie_player',
   template: function() {
     return [
-    '<div class="channels-featured-video soc_channel-module channel-module yt-uix-c3-module-container has-visible-edge">',
+    '<div class="channels-featured-video $(customClass) channel-module yt-uix-c3-module-container has-visible-edge">',
     '  <div class="module-view featured-video-view-module">',
     '    <div id="',this.id,'"></div>',
     '    <div class="channels-featured-video-details yt-tile-visible clearfix">',
@@ -18,7 +18,8 @@ var playerTemplate = {
     '</div>'].join('');
   },
 
-  get: function(vars) {
+  get: function(vars, withMargin) {
+    vars.customClass = withMargin ? 'soc_channel-module-margin' : 'soc_channel-module';
     return this.template().replace(/\$\((\w+)\)/g, function($0, $1) {
       return ($1 in vars ? vars[$1] : '');
     });
