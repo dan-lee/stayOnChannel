@@ -8,14 +8,16 @@ body {
   background-repeat: no-repeat;
   background: -webkit-radial-gradient(50% 25%, rgba(208, 200, 200, 0.20), rgba(239, 255, 253, 0.59));
   background-attachment: fixed;
+
+  font-family: Georgia, Arial, serif;
 }
 
 fieldset {
+  width: 600px;
   margin: 20px;
-  padding: 00 15px 15px;
+  padding: 0 15px 15px;
   border: 1px solid #afafaf;
   border-radius: 15px;
-  width: 420px;
 }
 
 fieldset legend {
@@ -30,6 +32,10 @@ fieldset ul {
   padding: 0;
 }
 
+fieldset ul li {
+  margin-bottom: 5px;
+}
+
 fieldset label {
   cursor: pointer;
 }
@@ -42,7 +48,6 @@ fieldset label sup {
 h1 {
   cursor: pointer;
   font-size: 32px;
-  font-family: Georgia;
   color: #eb625b;
   padding: 20px;
   background: none repeat scroll 0 0 #e9e9e9;
