@@ -11,53 +11,70 @@
 <section id="content">
 
 <h1>
-  Stay On Channel <sup>1.3</sup>
-  <span style="display: none;opacity: 0; color: green;" id="success">✓</span>
-  <span style="display: none;opacity: 0; color: #e76c6c;" id="failure">✘</span>
+  <span id="title">Stay On Channel</span> <sup>1.3</sup>
+  <span id="success">✓</span>
+  <span id="failure">✗</span>
 </h1>
+<div style=" height: 1px; width: 100%; border-bottom: 3px double rgb(226, 226, 226);">&nbsp;</div>
 
 <fieldset id="settings">
-  <legend>Settings <span style="text-transform: none;font-size: 12px;font-style: italic;">(are saved on click)</span></legend>
+  <legend>Settings <span style="text-transform: none;" class="small italic">(are saved on change)</span></legend>
 
   <ul>
     <li>
       <label>
-        <input id="playNext" type="checkbox">
-        Play next video automatically when finished (if next video is available) *
+        <input id="autoPlay" type="checkbox">
+        Auto play on click
       </label>
     </li>
 
     <li>
       <label>
-        <input id="autoPlay" type="checkbox">
-        Auto play on click 
+        <input id="playNext" type="checkbox">
+        Play next video in list, when finished (if available) <span class="stay-on-channel">✚</span>
       </label>
     </li>
 
     <li>
       <label>
         <input id="jumpToPlayer" type="checkbox">
-        Jump to player on click 
+        Jump to player, when video is clicked
       </label>
     </li>
 
     <li>
       <label>
         <input id="rightClickRedirect" type="checkbox">
-        Right click redirects to video page 
+        Right click redirects to video page (<span class="italic">disables the context menu!</span>)
       </label>
     </li>
 
     <li>
       <label>
         <input id="extendPlaylist" type="checkbox">
-        Enhance playlist with zoom buttons for better overview in channels *
+        Enhance playlist with zoom buttons for better overview in channels <span class="stay-on-channel">✚</span>
       </label>
     </li>
+
+    <!--
+    <li>
+      <label>
+        If available, prefer following quality:
+        <select>
+          <option>1080p</option>
+          <option>720p</option>
+          <option>480p</option>
+          <option>360p</option>
+          <option>240p</option>
+        </select>
+        <span class="stay-on-channel">✚</span>
+      </label>
+    </li>
+    -->
   </ul>
 </fieldset>
 
-<span style="font-style: italic; margin-left: 20px;">* new in this version</span>
+<span class="small stay-on-channel" style="margin-left: 20px;">“✚” means that this feature is new in this version</span>
 
 </section>
 </body>

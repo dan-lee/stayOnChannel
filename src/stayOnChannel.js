@@ -79,7 +79,7 @@
 
         // inject javascript code for instantiating the new player
         var javascriptCode = [
-          'new YT.Player("',this.player.id,'", {',
+          'var player = new YT.Player("',this.player.id,'", {',
           '  videoId: "',videoId,'",',
           '  events: {',
           truth(settings.autoPlay, 'onReady: function(e) { e.target.playVideo(); }'),

@@ -1,3 +1,16 @@
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.stay-on-channel {
+  color: #eb625b;
+}
+
 html, body, h1, #content {
   margin: 0;
   padding: 0;
@@ -43,6 +56,26 @@ fieldset label {
 fieldset label sup {
   text-decoration: underline;
   color: #00008b;
+}
+
+#success {
+  display: none;
+  opacity: 0;
+  color: green;
+}
+
+#failure {
+  display: none;
+  opacity: 0;
+  color: #e76c6c;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.italic {
+  font-style: italic;
 }
 
 h1 {
