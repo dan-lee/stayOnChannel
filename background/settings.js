@@ -4,8 +4,9 @@ var settings = (function(localStorage) {
     playNext: true,
     autoPlay: true,
     jumpToPlayer: true,
+    autoPlayJumpToPlayer: true,
     rightClickRedirect: false,
-    extendPlaylist: true,
+    //extendPlaylist: true,
     //autoQuality: [1080, 720, 480, 360, 240]
   }, activeSettings = {};
 

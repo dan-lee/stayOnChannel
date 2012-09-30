@@ -6,55 +6,62 @@ var videoPlayer = {
   timedOut: false,
 
   init: function() {
+    this.onReady(function() {
+      this.hasFeaturedPlayer && this.calculateOffset();
+    });
+
     // load youtube iframe api which will automatically replace the old video player
     injectJavaScript(null, '//www.youtube.com/iframe_api');
 
-    this.onReady(function() {
-      var eval = 'var StayOnChannel = (' + (function() {
+    var eval = 'var StayOnChannel = (' + (function() {
+      var playNext = $(playNext),
+          autoPlay = $(autoPlay);
 
-        var playNext = $(playNext),
-            autoPlay = $(autoPlay);
+      var evt = document.createEvent('Event');
+      evt.initEvent('playNext', true, false);
 
-        var evt = document.createEvent('Event');
-        evt.initEvent('playNext', true, false);
-
-        return {
-          // notify the content script
-          playerStateChange: function(e) {
-            if (e.data == YT.PlayerState.ENDED && playNext) {
-              document.dispatchEvent(evt);
-            }
-          },
-
-          onReady: function(e) {
-            autoPlay && e.target.playVideo();
-          },
-
-          startVideo: function(videoId) {
-            var self = this;
-            return new YT.Player('$(playerId)', {
-              videoId: videoId,
-              events: {
-                onReady: this.onReady,
-                onStateChange: this.playerStateChange
-              }
-            });
+      return {
+        // notify the content script
+        playerStateChange: function(e) {
+          if (e.data == YT.PlayerState.ENDED && playNext) {
+            document.dispatchEvent(evt);
           }
-        };
-      }) + ')();';
+        },
 
-      var inject = new Template();
-      inject.setContent(eval);
-      inject.setVars({
-        playerId: videoPlayer.player.id,
-        playNext: settings.playNext.toString(),
-        autoPlay: settings.autoPlay.toString()
-      });
+        onReady: function(e) {
+          autoPlay && e.target.playVideo();
+        },
 
-      injectJavaScript(inject.get());
+        startVideo: function(elementId, videoId) {
+          var self = this;
+          return new YT.Player(elementId, {
+            videoId: videoId,
+            events: {
+              onReady: this.onReady,
+              onStateChange: this.playerStateChange
+            }
+          });
+        }
+      };
+    }) + ')();';
 
-      this.hasFeaturedPlayer && this.calculateOffset();
+    var inject = new Template();
+    inject.setContent(eval);
+    inject.setVars({
+      playNext: settings.playNext.toString(),
+      autoPlay: settings.autoPlay.toString()
     });
+    injectJavaScript(inject.get());
+  },
+
+  startVideo: function(videoId) {
+    if (!this.hasFeaturedPlayer || this.timedOut) {
+      if (window.confirm('No "featured video" player found. Do you want "YouTube™ Stay On Channel" to create a video player in this window?')) {
+        this.create(videoId);
+      }
+    } else {
+      this.replaceVideo(videoId);
+    }
   },
 
   create: function(videoId, next) {
@@ -77,7 +84,7 @@ var videoPlayer = {
         appendTo.outerHTML += playerTemplate.get();
         self.player = document.getElementById(info.playerId);
         self.calculateOffset();
-        self.replaceVideo(videoId, next);
+        self.replaceVideo(videoId);
       });
     });
   },
@@ -127,11 +134,8 @@ var videoPlayer = {
           .innerHTML = '<span>'+info.creator+'</span> <span class="created-date">'+info.created+'</span>';
       });
 
-      var eval = 'StayOnChannel.startVideo("'+videoId+'");';
+      var eval = 'StayOnChannel.startVideo("'+this.player.id+'", "'+videoId+'");';
       injectJavaScript(eval);
-
-      // don't jump to anchors, use scrollTo and absolute positions instead (looks cleaner, doesn't change url)
-      settings.jumpToPlayer && this.jumpTo();
     });
   },
 

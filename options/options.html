@@ -32,15 +32,22 @@
 
     <li>
       <label>
-        <input id="playNext" type="checkbox">
-        Play next video in list, when finished (if available) <span class="stay-on-channel">✚</span>
+        <input id="jumpToPlayer" type="checkbox">
+        Jump to video player, when video is clicked
       </label>
     </li>
 
     <li>
       <label>
-        <input id="jumpToPlayer" type="checkbox">
-        Jump to player, when video is clicked
+        <input id="playNext" type="checkbox">
+        <span class="italic">Auto play mode</span>: Play next video in list, when finished (if available) <span class="stay-on-channel">✚</span>
+      </label>
+    </li>
+
+    <li>
+      <label>
+        <input id="autoPlayJumpToPlayer" type="checkbox">
+        ↳ Jump to player in <span class="italic">auto play mode</span> <span class="stay-on-channel">✚</span>
       </label>
     </li>
 
@@ -51,6 +58,7 @@
       </label>
     </li>
 
+    <!--
     <li>
       <label>
         <input id="extendPlaylist" type="checkbox">
@@ -58,7 +66,7 @@
       </label>
     </li>
 
-    <!--
+
     <li>
       <label>
         If available, prefer following quality:
@@ -76,7 +84,7 @@
   </ul>
 </fieldset>
 
-<span class="small stay-on-channel" style="margin-left: 20px;">“✚” means that this feature is new in this version</span>
+<span class="small stay-on-channel" style="margin-left: 20px;">“✚” this is a new added feature in this version</span>
 
 </section>
 </body>
