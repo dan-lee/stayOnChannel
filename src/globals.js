@@ -1,3 +1,5 @@
+var settings;
+
 function truth(assert, returnValue) {
   return assert == true && returnValue || '';
 }
@@ -89,13 +91,15 @@ function getQueryParam(name, url) {
   return getParameterByName(name, parsedUrl);
 }
 
-function injectJavaScript(src, textContent) {
+function injectJavaScript(textContent, src) {
   var scriptElement = document.createElement('script');
-  if (!!src) {
-    scriptElement.src = src;
-  } else if (!!textContent) {
+  if (!!textContent) {
     scriptElement.textContent = textContent;
+  } else if (!!src) {
+    scriptElement.src = src;
   }
-  var target = document.getElementsByTagName('head')[0] || document.body || document.documentElement;
-  target.appendChild(scriptElement);
+  scriptElement.onload = function() {
+    this.parentNode.removeChild(this);
+  };
+  (document.getElementsByTagName('head')[0] || document.body || document.documentElement).appendChild(scriptElement);
 }

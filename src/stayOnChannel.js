@@ -1,145 +1,5 @@
 (function() {
-  var videoLinks, linklistLength, index = 0, settings;
-
-  var videoPlayer = {
-    offsetTop: null,
-    hasFeaturedPlayer: false,
-    player: null,
-    timeout: 15,
-    timedOut: false,
-
-    init: function() {
-      // load youtube iframe api which will automatically replace the old video player
-      injectJavaScript('//www.youtube.com/iframe_api');
-
-      this.onReady(function() {
-        this.hasFeaturedPlayer && this.calculateOffset();
-      });
-    },
-
-    create: function(videoId) {
-      console.log('Creating player...');
-
-      getVideoInfo(videoId, function(info) {
-        // append it after horizontal ruler in the feed
-        var appendTo = document.querySelector('.yt-horizontal-rule.channel-section-hr, .playlist-info');
-        var extraMargin = !appendTo.classList.contains('playlist-info');
-
-        appendTo.outerHTML += playerTemplate.get(info, extraMargin);
-
-        this.player = document.getElementById(playerTemplate.id);
-        this.calculateOffset();
-        this.replaceVideo(videoId);
-      }.bind(this));
-    },
-
-    onReady: function(callback) {
-      var i = 0;
-      var check = window.setInterval(function() {
-        var videoPlayer = document.querySelector('#movie_player, #movie_player-flash, #movie_player-html5');
-
-        // search for video player timed out, an own player needs to be created
-        if (++i > this.timeout) {
-          this.timedOut = true;
-          this.hasFeaturedPlayer = false;
-          window.clearInterval(check);
-          console.log('No featured player found.');
-        }
-
-        if (videoPlayer) {
-          this.timedOut = false;
-          this.hasFeaturedPlayer = true;
-          this.player = videoPlayer;
-          window.clearInterval(check);
-          window.setTimeout(callback.call(this), 100);
-        }
-      }.bind(this), 100);
-    },
-
-    replaceVideo: function(videoId, jumpToPlayer) {
-      this.onReady(function() {
-        var tempDiv = document.createElement('div');
-        tempDiv.id = this.player.id;
-        this.player.parentNode.replaceChild(tempDiv, this.player);
-
-        // replace meta data of the video
-        var base = document.querySelector('.channels-featured-video-details');
-
-        getVideoInfo(videoId, function(info) {
-          // replace link, title and view count
-          base
-            .querySelector('.channels-featured-video-details h3')
-            .innerHTML =  '<a href="/watch?v='+videoId+'">'+info.title+'</a><div class="view-count-and-actions"><div class="view-count"><span class="count">'+info.views+'</span> views</div></div>';
-
-          // replace creator and create date
-          base
-            .querySelector('.channels-featured-video-metadata')
-            .innerHTML = '<span>'+info.creator+'</span> <span class="created-date">'+info.created+'</span>';
-        });
-
-        // inject javascript code for instantiating the new player
-        var javascriptCode = [
-          'var player = new YT.Player("',this.player.id,'", {',
-          '  videoId: "',videoId,'",',
-          '  events: {',
-          truth(settings.autoPlay, 'onReady: function(e) { e.target.playVideo(); }'),
-          '  }',
-          '});'].join('');
-        injectJavaScript(null, javascriptCode);
-
-        // don't jump to anchors, use scrollTo and absolute positions instead (looks cleaner, doesn't change url)
-        settings.jumpToPlayer && this.jumpTo();
-      });
-    },
-
-    calculateOffset: function() {
-      var self = this;
-      this.offsetTop = (function() {
-        var offsetTop = 0, current = self.player;
-        do {
-          offsetTop += current.offsetTop;
-        } while(current = current.offsetParent);
-
-        // jump a bit above for the good feeling
-        return offsetTop - 20;
-      })();
-    },
-
-    jumpTo: function() {
-      window.scrollTo(0, this.offsetTop);
-    }
-  };
-
-  // this may be called multiple times (after "Load more" button is clicked)
-  function registerLinkEventListeners() {
-    for(;index < linklistLength; index++) {
-      var element = videoLinks[index];
-      element.addEventListener('click', replaceVideoContainer);
-
-      // right click will redirect to the video page
-      element.addEventListener('contextmenu', redirectToVideo);
-    }
-  }
-
-  function replaceVideoContainer(e) {
-    if (settings.extensionActive) {
-      e.preventDefault();
-      var videoId = getQueryParam('v', this.href);
-
-      if (!videoPlayer.hasFeaturedPlayer || videoPlayer.timedOut) {
-        if (window.confirm('No "featured video" player found. Do you want "YouTube™ Stay On Channel" to create a video player in this window?')) {
-          videoPlayer.create(videoId);
-        }
-      } else {
-        videoPlayer.replaceVideo(videoId);
-      }
-    }
-  }
-
-  function redirectToVideo(e) {
-    // http://javascriptweblog.wordpress.com/2011/04/04/the-javascript-comma-operator/
-    settings.rightClickRedirect && (e.preventDefault(), window.location = this.href);
-  }
+  var videoLinks, linklistLength, index = 0, activeSelector, activeVideoIndex = 0;
 
   // keep an ear open for external setting updates
   communicator.on('refreshSettings', function(response) {
@@ -157,7 +17,7 @@
       return;
     }
 
-    if (!getVideoLinks()) {
+    if (!collectVideoLinks()) {
       // no video links on this channel; abort!
       // @todo playlist support
       return;
@@ -167,11 +27,11 @@
     communicator.request('allSettings', function(remoteSettings) {
       settings = remoteSettings;
       console.log('"YouTube Stay on channel" started', truth(!settings.extensionActive, '[inactive]'));
-
+      videoPlayer.init();
       settings.extendPlaylist && extendPlaylist();
     });
 
-    videoPlayer.init();
+
 
     // if it's an featured channel, then attach an event listener to 'load more' button, so new videos will get an event listener too.
     registerLoadMoreButton();
@@ -179,17 +39,72 @@
     // and finally register event listeners to all found video links on the channel
     linklistLength = videoLinks.length;
     registerLinkEventListeners();
+
+    document.addEventListener('playNext', function() {
+      videoPlayer.replaceVideo(getNextVideoId());
+      activeVideoIndex++;
+    });
   }
 
-  function getVideoLinks() {
+  function getNextVideoId() {
+    var next = videoLinks[activeVideoIndex+1];
+    return next ? getQueryParam('v', next) : false;
+  }
+
+  // this may be called multiple times (after "Load more" button is clicked)
+  function registerLinkEventListeners() {
+    for(;index < linklistLength; index++) {
+      var element = videoLinks[index];
+      (function(index) {
+        element.addEventListener('click', function() {
+          activeVideoIndex = index;
+        });
+      })(index);
+      element.addEventListener('click', replaceVideoContainer);
+
+      // right click will redirect to the video page
+      element.addEventListener('contextmenu', redirectToVideo);
+    }
+  }
+
+  function replaceVideoContainer(e) {
+    if (settings.extensionActive) {
+      e.preventDefault();
+      var videoId = getQueryParam('v', this.href);
+      var next    = getQueryParam('v', getNextVideoId());
+
+      if (!videoPlayer.hasFeaturedPlayer || videoPlayer.timedOut) {
+        if (window.confirm('No "featured video" player found. Do you want "YouTube™ Stay On Channel" to create a video player in this window?')) {
+          videoPlayer.create(videoId);
+        }
+      } else {
+        videoPlayer.replaceVideo(videoId);
+      }
+    }
+  }
+
+  function redirectToVideo(e) {
+    // http://javascriptweblog.wordpress.com/2011/04/04/the-javascript-comma-operator/
+    settings.rightClickRedirect && (e.preventDefault(), window.location = this.href);
+  }
+
+  function collectVideoLinks() {
+    var feedSelector = '.primary-pane .yt-uix-contextlink.yt-uix-sessionlink:not(.yt-pl-thumb-link):not(.yt-user-name)';
+    var featuredSelector = '.gh-single-playlist .yt-uix-sessionlink:not(.yt-user-name)';
+
     // select "Feed channels"
-    var feeds = document.querySelectorAll('.primary-pane .yt-uix-contextlink.yt-uix-sessionlink:not(.yt-pl-thumb-link):not(.yt-user-name)');
-    // select "Featured channels"
-    var featured = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink:not(.yt-user-name)');
+    var feeds = document.querySelectorAll(feedSelector);
 
-    // if feeds are selected, assume that there is no featured player
-    videoLinks = feeds.length ? (videoPlayer.hasFeaturedPlayer = false, feeds) : featured;
-
+    if (feeds.length) {
+      videoLinks = feeds;
+      activeSelector = feedSelector;
+    } else {
+      // select "Featured channels"
+      videoLinks = document.querySelectorAll(featuredSelector);
+      activeSelector = featuredSelector;
+      // if feeds are selected, assume that there is no featured player
+      videoPlayer.hasFeaturedPlayer = false;
+    }
     return !!videoLinks.length;
   }
 
@@ -197,7 +112,8 @@
     var loadMoreButton = document.querySelector('button.more-videos, button.load-more-button');
     loadMoreButton && loadMoreButton.addEventListener('click', function() {
       var checkLinkInterval = window.setInterval(function() {
-        videoLinks = document.querySelectorAll('.gh-single-playlist .yt-uix-sessionlink');
+        videoLinks = document.querySelectorAll(activeSelector);
+
         if ((linklistLength = videoLinks.length) > index) {
           window.clearInterval(checkLinkInterval);
           registerLinkEventListeners();

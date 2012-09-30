@@ -16,7 +16,8 @@
     "js": [
       "src/globals.js",
       "src/communicator.js",
-      "src/playerTemplate.js",
+      "src/template.js",
+      "src/videoPlayer.js",
       "src/stayOnChannel.js"
     ],
     "css": [
@@ -24,6 +25,10 @@
     ],
     "run_at": "document_end"
   }],
+  "web_accessible_resources": [
+    "src/resources/player.html",
+    "icons/yt.png"
+  ],
   "options_page": "options/options.html",
   "background": {
     "scripts": [
