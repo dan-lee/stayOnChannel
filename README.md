@@ -1,4 +1,4 @@
-YouTube™ Stay On Channel
+[YouTube™ Stay On Channel](http://tiny.cc/stayOnChannel)
 =============
 
 Do you want the old YouTube channel behaviour back?
