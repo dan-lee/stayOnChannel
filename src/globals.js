@@ -4,11 +4,6 @@ function truth(assert, returnValue) {
   return assert == true && returnValue || '';
 }
 
-function getParameterByName(name, location) {
-  var match = new RegExp('[?&]' + name + '=([^&]*)').exec(location);
-  return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-}
-
 String.prototype.separateThousandth = function() {
   return this.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
@@ -84,6 +79,11 @@ function parseUrl(urlString) {
   var a = document.createElement('a');
   a.href = urlString;
   return a;
+}
+
+function getParameterByName(name, location) {
+  var match = new RegExp('[?&]' + name + '=([^&]*)').exec(location);
+  return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
 }
 
 function getQueryParam(name, url) {

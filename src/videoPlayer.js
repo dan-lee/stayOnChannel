@@ -6,16 +6,20 @@ var videoPlayer = {
   timedOut: false,
 
   init: function() {
+    this.injectVideoPlayer();
+
     this.onReady(function() {
       this.hasFeaturedPlayer && this.calculateOffset();
     });
+  },
 
+  injectVideoPlayer: function() {
     // load youtube iframe api which will automatically replace the old video player
     injectJavaScript(null, '//www.youtube.com/iframe_api');
 
     var eval = 'var StayOnChannel = (' + (function() {
       var playNext = $(playNext),
-          autoPlay = $(autoPlay);
+        autoPlay = $(autoPlay);
 
       var evt = document.createEvent('Event');
       evt.initEvent('playNext', true, false);
@@ -32,13 +36,32 @@ var videoPlayer = {
           autoPlay && e.target.playVideo();
         },
 
+        error: function(code) {
+          switch(code) {
+            case 2:
+              // invalid Id
+              break;
+            case 5:
+              // no html
+              break;
+            case 100:
+              // video removed
+              break;
+            case 101:
+            case 150:
+              // not allowed to play embeded videos
+              break;
+          }
+        },
+
         startVideo: function(elementId, videoId) {
           var self = this;
           return new YT.Player(elementId, {
             videoId: videoId,
             events: {
               onReady: this.onReady,
-              onStateChange: this.playerStateChange
+              onStateChange: this.playerStateChange,
+              onError: this.error
             }
           });
         }
@@ -64,7 +87,7 @@ var videoPlayer = {
     }
   },
 
-  create: function(videoId, next) {
+  create: function(videoId) {
     console.log('Creating player...');
     var self = this;
 

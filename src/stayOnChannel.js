@@ -53,15 +53,22 @@
     });
   }
 
-  function playNextVideo() {
-    var next = videoLinks[activeVideoIndex+1];
 
-    if (!next) {
+  function playNextVideo() {
+    var next, current = getQueryParam('v', videoLinks[activeVideoIndex]),
+        checkIndex = activeVideoIndex;
+
+    do {
+      next = getQueryParam('v', videoLinks[++checkIndex]);
+    } while(next == current && checkIndex <= linklistLength);
+
+    if (next == current) {
       return false;
     }
-    videoPlayer.replaceVideo(getQueryParam('v', next));
+
+    activeVideoIndex = checkIndex;
+    videoPlayer.replaceVideo(next);
     settings.autoPlayJumpToPlayer && videoPlayer.jumpTo();
-    activeVideoIndex++;
 
     return true;
   }
