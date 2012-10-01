@@ -46,11 +46,22 @@ fieldset ul {
 }
 
 fieldset ul li {
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
 fieldset label {
   cursor: pointer;
+  display: block;
+  padding-left: 20px;
+  text-indent: -23px;
+}
+
+fieldset label input {
+  width: 20px;
+  margin: 0;
+  vertical-align: bottom;
+  position: relative;
+  top: -2px;
 }
 
 fieldset label sup {
@@ -71,7 +82,7 @@ fieldset label sup {
 }
 
 .small {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .italic {

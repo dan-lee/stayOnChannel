@@ -39,8 +39,18 @@
     linklistLength = videoLinks.length;
     registerLinkEventListeners();
 
-    document.addEventListener('playNext', function() {
-      if (!playNextVideo()) {
+  }
+
+  document.addEventListener('playNext', playNextVideo);
+
+  function playNextVideo() {
+    if (settings.autoPlay) {
+      var next = getNextVideo();
+      if (next) {
+        activeVideoIndex = next.indexId;
+        videoPlayer.replaceVideo(next.videoId);
+        settings.autoPlayJumpToPlayer && videoPlayer.jumpTo();
+      } else {
         if (registerLoadMoreButton()) {
           var evt = document.createEvent('MouseEvents');
           evt.initEvent('click', true, true);
@@ -50,27 +60,21 @@
           console.log('End of channel playlist reached.');
         }
       }
-    });
+    }
   }
 
-
-  function playNextVideo() {
-    var next, current = getQueryParam('v', videoLinks[activeVideoIndex]),
-        checkIndex = activeVideoIndex;
+  function getNextVideo() {
+    var next, checkIndex = activeVideoIndex, current = getQueryParam('v', videoLinks[activeVideoIndex]);
 
     do {
       next = getQueryParam('v', videoLinks[++checkIndex]);
     } while(next == current && checkIndex <= linklistLength);
 
-    if (next == current) {
+    if (next == current || checkIndex == linklistLength) {
       return false;
     }
-
     activeVideoIndex = checkIndex;
-    videoPlayer.replaceVideo(next);
-    settings.autoPlayJumpToPlayer && videoPlayer.jumpTo();
-
-    return true;
+    return { videoId: next, indexId: checkIndex };
   }
 
   // this may be called multiple times (after "Load more" button is clicked)
