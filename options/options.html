@@ -11,9 +11,9 @@
 <section id="content">
 
 <h1>
-  <img src="../icons/yt.png" style="vertical-align: middle; height: 60px; margin-top: -6px;">
+  <img src="../icons/yt.png" id="yt-icon">
 
-  <span id="title">Stay On Channel</span> <sup>1<span style="color: #6198ca;">.</span>3</sup>
+  <span id="title">Stay On Channel</span> <sup>1<span class="light-blue">.</span>3</sup>
   <span id="success">✓</span>
   <span id="failure">✗</span>
 </h1>
@@ -54,10 +54,41 @@
 
     <li>
       <label>
-        <input id="rightClickRedirect" type="checkbox">
-        Right click redirects to video page (<span class="italic">disables the context menu!</span>)
+      <input id="skipBrokenVideos" type="checkbox">
+      ↳ Skip videos that are not playable (<span class="italic">e.g.: not allowed to be played inline</span>)
       </label>
     </li>
+
+    <li>
+      <label>
+        <input id="rightClickRedirect" type="checkbox">
+        Right click redirects to video page (<span class="italic">disables the context menu on video links!</span>)
+      </label>
+    </li>
+
+    <!--
+    <li>
+      <label>
+        <input id="extendPlaylist" type="checkbox">
+        Enhance playlist with zoom buttons for better overview in channels <span class="stay-on-channel">✚</span>
+      </label>
+    </li>
+
+
+    <li>
+      <label>
+        If available, prefer following quality:
+        <select>
+          <option>1080p</option>
+          <option>720p</option>
+          <option>480p</option>
+          <option>360p</option>
+          <option>240p</option>
+        </select>
+        <span class="stay-on-channel">✚</span>
+      </label>
+    </li>
+    -->
   </ul>
 </fieldset>
 

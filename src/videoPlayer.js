@@ -36,19 +36,24 @@ var videoPlayer = {
           autoPlay && e.target.playVideo();
         },
 
-        error: function(code) {
+        onError: function(code) {
+          autoPlay && document.dispatchEvent(evt);
           switch(code) {
             case 2:
+              console.log('Malformed video id.');
               // invalid Id
               break;
             case 5:
-              // no html
+              console.log('Cannot be played as HTML5.');
+              // not allowed as html5
               break;
             case 100:
+              console.log('Video has been removed.');
               // video removed
               break;
             case 101:
             case 150:
+              console.log('Video is not allowed to be played embedded.');
               // not allowed to play embeded videos
               break;
           }
@@ -59,9 +64,9 @@ var videoPlayer = {
           return new YT.Player(elementId, {
             videoId: videoId,
             events: {
-              onReady: this.onReady,
-              onStateChange: this.playerStateChange,
-              onError: this.error
+              onReady: self.onReady,
+              onError: self.onError,
+              onStateChange: self.playerStateChange
             }
           });
         }
