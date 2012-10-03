@@ -10,7 +10,7 @@ After you clicked on the video link, the video will be loaded into the "featured
 
 This works for any kind of channel ("Featured", "Feed" and "Playlist").
 
-**NEW IN v1.4**:
+**New in v1.4**:
  - Playlist support
  - Bugfixes
 
