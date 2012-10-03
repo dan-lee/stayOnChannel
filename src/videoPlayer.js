@@ -4,8 +4,10 @@ var videoPlayer = {
   player: null,
   timeout: 15,
   timedOut: false,
+  channelType: null,
 
-  init: function() {
+  init: function(channelType) {
+    this.channelType = channelType;
     this.injectVideoPlayer();
 
     this.onReady(function() {
@@ -97,14 +99,25 @@ var videoPlayer = {
     var self = this;
 
     getVideoInfo(videoId, function(info) {
-      // append it after horizontal ruler in the feed
-      var appendTo = document.querySelector('.yt-horizontal-rule.channel-section-hr, .playlist-info');
+      var selector, customClass = '';
 
-      // if this is an featured channel, then don't apply extra margin
-      var extraMargin = appendTo.classList.contains('playlist-info') ? 'soc_channel-module' : 'soc_channel-module-margin';
+      switch(self.channelType) {
+        case ChannelTypes.FEATURED:
+          selector = '.playlist-info';
+          customClass = 'soc_channel-module';
+          break;
+        case ChannelTypes.FEED:
+          selector = '.yt-horizontal-rule.channel-section-hr';
+          customClass = 'soc_channel-module-margin';
+          break;
+        case ChannelTypes.PLAYLIST:
+          selector = '#playlist-actions';
+          break;
+      }
+      var appendTo = document.querySelector(selector);
 
       info.playerId = 'movie_player';
-      info.customClass = extraMargin;
+      info.customClass = customClass;
 
       var playerTemplate = new Template();
       playerTemplate.loadContent(chrome.extension.getURL('src/resources/player.html'), function() {

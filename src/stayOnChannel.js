@@ -1,6 +1,6 @@
 (function() {
   var videoLinks, linklistLength, index = 0, activeSelector,
-      activeVideoIndex = 0, loadMoreButton, playNext;
+      activeVideoIndex = 0, loadMoreButton, playNext, channelType;
 
   // keep an ear open for external setting updates
   communicator.on('refreshSettings', function(response) {
@@ -8,19 +8,13 @@
   });
 
   function initialize() {
-    if (!document.querySelector('#page.channel')) {
-      // this is no channel; abort!
-      return;
-    }
-
-    if (document.querySelector('.comment-post')) {
-      // this is the comment feed; abort!
+    if (!(document.querySelector('#page.channel') || document.querySelector('#page.playlist')) || document.querySelector('.comment-post')) {
+      // this is no channel/playlist; abort!
       return;
     }
 
     if (!collectVideoLinks()) {
       // no video links on this channel; abort!
-      // @todo playlist support
       return;
     }
 
@@ -28,8 +22,8 @@
     communicator.request('allSettings', function(remoteSettings) {
       settings = remoteSettings;
       console.log('"YouTube Stay on channel" started', truth(!settings.extensionActive, '[inactive]'));
-      videoPlayer.init();
-      settings.extendPlaylist && extendPlaylist();
+      videoPlayer.init(channelType);
+      //settings.extendPlaylist && extendPlaylist();
     });
 
     // if it's an featured channel, then attach an event listener to 'load more' button, so new videos will get an event listener too.
@@ -112,19 +106,17 @@
   function collectVideoLinks() {
     var feedSelector = '.primary-pane .yt-uix-contextlink.yt-uix-sessionlink:not(.yt-pl-thumb-link):not(.yt-user-name)';
     var featuredSelector = '.gh-single-playlist .yt-uix-sessionlink:not(.yt-user-name)';
+    var playlistSelector = '.primary-pane .yt-uix-sessionlink:not(.yt-pl-thumb-link):not(.yt-user-name)';
 
-    // select "Feed channels"
-    var feeds = document.querySelectorAll(feedSelector);
-
-    if (feeds.length) {
-      videoLinks = feeds;
+    if ((videoLinks = document.querySelectorAll(feedSelector)) && videoLinks.length) {
       activeSelector = feedSelector;
-    } else {
-      // select "Featured channels"
-      videoLinks = document.querySelectorAll(featuredSelector);
+      channelType = ChannelTypes.FEED;
+    } else if ((videoLinks = document.querySelectorAll(featuredSelector)) && videoLinks.length) {
       activeSelector = featuredSelector;
-      // if feeds are selected, assume that there is no featured player
-      videoPlayer.hasFeaturedPlayer = false;
+      channelType = ChannelTypes.FEATURED;
+    } else if ((videoLinks = document.querySelectorAll(playlistSelector)) && videoLinks.length) {
+      activeSelector = playlistSelector;
+      channelType = ChannelTypes.PLAYLIST;
     }
     return !!videoLinks.length;
   }
@@ -134,8 +126,10 @@
 
     if (loadMoreButton) {
       loadMoreButton.addEventListener('click', function() {
+        console.log('click');
         waitForLinks(function() {
           registerLinkEventListeners();
+          registerLoadMoreButton();
           playNext && playNextVideo() && (playNext = false);
         });
       });

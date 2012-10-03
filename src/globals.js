@@ -1,5 +1,11 @@
 var settings;
 
+var ChannelTypes = {
+  FEATURED: 0,
+  FEED: 1,
+  PLAYLIST: 2
+};
+
 function truth(assert, returnValue) {
   return assert == true && returnValue || '';
 }
