@@ -99,6 +99,14 @@ fieldset label sup {
   font-style: italic;
 }
 
+header:after {
+  content: '';
+  display: block;
+  height: 1px;
+  width: 100%;
+  border-bottom: 3px double rgb(226, 226, 226);
+}
+
 h1 {
   cursor: pointer;
   font-size: 32px;

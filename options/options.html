@@ -4,96 +4,98 @@
   <meta charset="utf-8">
   <title>Stay On Channel – Options</title>
   <link href="options.css" rel="stylesheet">
+  <link href="../icons/icon48_red.png" type="image/png" rel="icon">
   <script src="../libs/jquery-1.8.2.min.js"></script>
   <script src="options.js"></script>
 </head>
 <body>
 <section id="content">
+  <header>
+    <h1>
+      <img src="../icons/yt.png" id="yt-icon">
 
-<h1>
-  <img src="../icons/yt.png" id="yt-icon">
+      <span id="title">Stay On Channel</span> <sup>1<span class="light-blue">.</span>4</sup>
+      <span id="success">✓</span>
+      <span id="failure">✗</span>
+    </h1>
+  </header>
 
-  <span id="title">Stay On Channel</span> <sup>1<span class="light-blue">.</span>4</sup>
-  <span id="success">✓</span>
-  <span id="failure">✗</span>
-</h1>
-<div style=" height: 1px; width: 100%; border-bottom: 3px double rgb(226, 226, 226);">&nbsp;</div>
+  <fieldset id="settings">
+    <legend>Settings <span style="text-transform: none;" class="small italic">(are saved on change)</span></legend>
 
-<fieldset id="settings">
-  <legend>Settings <span style="text-transform: none;" class="small italic">(are saved on change)</span></legend>
+    <ul>
+      <li>
+        <label>
+          <input id="autoPlay" type="checkbox">
+          Auto play on click
+        </label>
+      </li>
 
-  <ul>
-    <li>
-      <label>
-        <input id="autoPlay" type="checkbox">
-        Auto play on click
-      </label>
-    </li>
+      <li>
+        <label>
+          <input id="jumpToPlayer" type="checkbox">
+          Jump to video player, when video is clicked
+        </label>
+      </li>
 
-    <li>
-      <label>
-        <input id="jumpToPlayer" type="checkbox">
-        Jump to video player, when video is clicked
-      </label>
-    </li>
+      <li>
+        <label>
+          <input id="playNext" type="checkbox">
+          <span class="italic">Auto play mode</span>: Plays next video in list when last one is finished.<br>
+          <span class="italic">This setting will also trigger the "Load more" button.</span> <span class="stay-on-channel">✚</span>
+        </label>
+      </li>
 
-    <li>
-      <label>
-        <input id="playNext" type="checkbox">
-        <span class="italic">Auto play mode</span>: Plays next video in list when last one is finished.<br>
-        <span class="italic">This setting will also trigger the "Load more" button.</span> <span class="stay-on-channel">✚</span>
-      </label>
-    </li>
+      <li>
+        <label>
+          <input id="autoPlayJumpToPlayer" type="checkbox">
+          ↳ Jump to player in <span class="italic">auto play mode</span> <span class="stay-on-channel">✚</span>
+        </label>
+      </li>
 
-    <li>
-      <label>
-        <input id="autoPlayJumpToPlayer" type="checkbox">
-        ↳ Jump to player in <span class="italic">auto play mode</span> <span class="stay-on-channel">✚</span>
-      </label>
-    </li>
+      <li>
+        <label>
+        <input id="skipBrokenVideos" type="checkbox">
+        ↳ Skip videos that are not playable (<span class="italic">e.g.: not allowed to be played inline</span>)
+        </label>
+      </li>
 
-    <li>
-      <label>
-      <input id="skipBrokenVideos" type="checkbox">
-      ↳ Skip videos that are not playable (<span class="italic">e.g.: not allowed to be played inline</span>)
-      </label>
-    </li>
+      <li>
+        <label>
+          <input id="rightClickRedirect" type="checkbox">
+          Right click redirects to video page (<span class="italic">disables the context menu on video links!</span>)
+        </label>
+      </li>
 
-    <li>
-      <label>
-        <input id="rightClickRedirect" type="checkbox">
-        Right click redirects to video page (<span class="italic">disables the context menu on video links!</span>)
-      </label>
-    </li>
-
-    <!--
-    <li>
-      <label>
-        <input id="extendPlaylist" type="checkbox">
-        Enhance playlist with zoom buttons for better overview in channels <span class="stay-on-channel">✚</span>
-      </label>
-    </li>
+      <!--
+      <li>
+        <label>
+          <input id="extendPlaylist" type="checkbox">
+          Enhance playlist with zoom buttons for better overview in channels <span class="stay-on-channel">✚</span>
+        </label>
+      </li>
 
 
-    <li>
-      <label>
-        If available, prefer following quality:
-        <select>
-          <option>1080p</option>
-          <option>720p</option>
-          <option>480p</option>
-          <option>360p</option>
-          <option>240p</option>
-        </select>
-        <span class="stay-on-channel">✚</span>
-      </label>
-    </li>
-    -->
-  </ul>
-</fieldset>
+      <li>
+        <label>
+          Prefer following quality, if available:
+          <select>
+            <option>1080p</option>
+            <option>720p</option>
+            <option>480p</option>
+            <option>360p</option>
+            <option>240p</option>
+          </select>
+          <span class="stay-on-channel">✚</span>
+        </label>
+      </li>
+      -->
+    </ul>
+  </fieldset>
 
-<span class="small stay-on-channel" style="margin-left: 20px;">“✚” this is a new added feature in this version</span>
-
+  <footer>
+    <span class="small stay-on-channel" style="margin-left: 20px;">“✚” this is a new added feature in this version</span>
+  </footer>
 </section>
 </body>
 </html>
