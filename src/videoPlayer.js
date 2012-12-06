@@ -5,6 +5,7 @@ var videoPlayer = {
   timeout: 15,
   timedOut: false,
   channelType: null,
+  maxConsecutiveErrors: 5,
 
   init: function(channelType) {
     this.channelType = channelType;
@@ -19,9 +20,14 @@ var videoPlayer = {
     // load youtube iframe api which will automatically replace the old video player
     injectJavaScript(null, '//www.youtube.com/iframe_api');
 
-    var eval = 'var StayOnChannel = (' + (function() {
-      var playNext = $(playNext),
-        autoPlay = $(autoPlay);
+    // this is transformed into a string and NOT executed here, but injected into the youtube page!
+    var template = 'var StayOnChannel = (' + (function() {
+      var
+        player,
+        playNext = [[playNext]],
+        autoPlay = [[autoPlay]],
+        autoQuality = '[[autoQuality]]',
+        errors = 0;
 
       var evt = document.createEvent('Event');
       evt.initEvent('playNext', true, false);
@@ -36,10 +42,15 @@ var videoPlayer = {
 
         onReady: function(e) {
           autoPlay && e.target.playVideo();
+          player.setPlaybackQuality(autoQuality);
         },
 
         onError: function(code) {
-          autoPlay && document.dispatchEvent(evt);
+          if (++errors < [[maxErrors]]) {
+            autoPlay && document.dispatchEvent(evt);
+          } else {
+            alert('Autoplay aborted due too much consecutive unplayable videos.')
+          }
           switch(code) {
             case 2:
               console.log('Malformed video id.');
@@ -63,7 +74,7 @@ var videoPlayer = {
 
         startVideo: function(elementId, videoId) {
           var self = this;
-          return new YT.Player(elementId, {
+          player = new YT.Player(elementId, {
             videoId: videoId,
             events: {
               onReady: self.onReady,
@@ -71,17 +82,40 @@ var videoPlayer = {
               onStateChange: self.playerStateChange
             }
           });
+        },
+
+        getPlayer: function() {
+          return player;
         }
       };
     }) + ')();';
 
     var inject = new Template();
-    inject.setContent(eval);
+    inject.setContent(template);
     inject.setVars({
       playNext: settings.playNext.toString(),
-      autoPlay: settings.autoPlay.toString()
+      autoPlay: settings.autoPlay.toString(),
+      autoQuality: this.getSuggestedQuality(),
+      maxErrors: this.maxConsecutiveErrors
     });
     injectJavaScript(inject.get());
+  },
+
+  getSuggestedQuality: function() {
+    var q = 'default';
+    if (settings.enableAutoQuality) {
+      switch(''+settings.autoQuality) {
+        case '240':  q = 'small';   break;
+        case '360':  q = 'medium';  break;
+        case '480':  q = 'large';   break;
+        case '720':  q = 'hd720';   break;
+        case '1080': q = 'hd1080';  break;
+        case 'max':  q = 'highres'; break;
+        default:     q = 'default';
+      }
+    }
+
+    return q;
   },
 
   startVideo: function(videoId) {

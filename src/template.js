@@ -12,7 +12,7 @@ Template.prototype.setContent = function(str) {
 };
 
 Template.prototype.setVars = function(vars) {
-  this.replacedString = this.originalString.replace(/\$\((\w+)\)/g, function($0, $1) {
+  this.replacedString = this.originalString.replace(/\[\[(\w+)\]\]/g, function($0, $1) {
     return ($1 in vars ? vars[$1] : '');
   });
 };

@@ -3,30 +3,50 @@ $(function() {
   var settings = background.settings;
   var communicator = background.communicator;
 
-  $('#settings').find('input').each(function() {
+  function success() {
+    $('#success').clearQueue().fadeTo(750, 1).delay(1000).fadeTo(750, 0);
+  }
+
+  function fail() {
+    $('#success').stop().hide();
+    $('#failure').clearQueue().fadeTo(500, 1).delay(1000).fadeTo(1000, 0);
+  }
+
+  $('#settings').find('input, select').each(function() {
     try {
       var settingValue = settings.get(this.id);
 
-      switch(typeof settingValue) {
-        case 'boolean':
+      switch(this.id) {
+        case 'autoQuality':
+          if (this.id == 'autoQuality') {
+            var select = $(this);
+
+            select.find('option').each(function() {
+              if ($(this).val().slice(0, -1) == settingValue) {
+                $(this).prop('selected', true);
+              }
+            });
+
+            select.on('change', function() {
+              var q = $(this).val().slice(0, -1);
+              if (settings.set(this.id, q)) {
+                success();
+              } else {
+                fail();
+              }
+            });
+          }
+          break;
+        default:
           var cb = $(this);
           $(this).prop('checked', settingValue);
           $(this).on('click', function() {
             if (settings.toggle(this.id)) {
-              communicator.notify('refreshSettings', settings.getAll());
-              $('#success').clearQueue().fadeTo(750, 1).delay(1000).fadeTo(750, 0);
+              success();
             } else {
-              $('#success').stop().hide();
-              $('#failure').clearQueue().fadeTo(500, 1).delay(1000).fadeTo(1000, 0);
+              fail();
             }
           });
-          break;
-        case 'string':
-          //
-          break;
-        default:
-          //
-          break;
       }
     } catch(e) {
       console.log(e.message);

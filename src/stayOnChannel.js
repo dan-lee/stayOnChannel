@@ -1,6 +1,13 @@
 (function() {
-  var videoLinks, linklistLength, index = 0, activeSelector,
-      activeVideoIndex = 0, loadMoreButton, playNext, channelType;
+  var
+    videoLinks,
+    linklistLength,
+    index = 0,
+    activeSelector,
+    activeVideoIndex = 0,
+    loadMoreButton,
+    playNext,
+    channelType;
 
   // keep an ear open for external setting updates
   communicator.on('refreshSettings', function(response) {
@@ -32,14 +39,6 @@
     // and finally register event listeners to all found video links on the channel
     linklistLength = videoLinks.length;
     registerLinkEventListeners();
-
-    /*
-     <li><a href="#" class="yt-uix-button yt-uix-sessionlink yt-uix-button-subnav channel-edit-btn yt-uix-button-dark" style="
-     box-shadow: 0px 0px 13px #DB0404;
-     "><span class="yt-uix-button-content">Stay On Channel Settings</span></a>
-     </li>
-     */
-
   }
 
   document.addEventListener('playNext', playNextVideo);

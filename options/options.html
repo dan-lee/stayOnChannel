@@ -42,21 +42,21 @@
         <label>
           <input id="playNext" type="checkbox">
           <span class="italic">Auto play mode</span>: Plays next video in list when last one is finished.<br>
-          <span class="italic">This setting will also trigger the "Load more" button.</span> <span class="stay-on-channel">✚</span>
+          <span class="italic">This setting will also trigger the "Load more" button.</span>
         </label>
       </li>
 
       <li>
-        <label>
+        <label style="margin-left: 15px">
           <input id="autoPlayJumpToPlayer" type="checkbox">
-          ↳ Jump to player in <span class="italic">auto play mode</span> <span class="stay-on-channel">✚</span>
+          Jump to player in <span class="italic">auto play mode</span>
         </label>
       </li>
 
       <li>
-        <label>
+        <label style="margin-left: 15px;">
         <input id="skipBrokenVideos" type="checkbox">
-        ↳ Skip videos that are not playable (<span class="italic">e.g.: not allowed to be played inline</span>)
+        Skip videos that are not playable (<span class="italic">e.g.: not allowed to be played inline</span>)
         </label>
       </li>
 
@@ -74,22 +74,22 @@
           Enhance playlist with zoom buttons for better overview in channels <span class="stay-on-channel">✚</span>
         </label>
       </li>
-
+      -->
 
       <li>
-        <label>
-          Prefer following quality, if available:
-          <select>
-            <option>1080p</option>
-            <option>720p</option>
-            <option>480p</option>
-            <option>360p</option>
-            <option>240p</option>
-          </select>
-          <span class="stay-on-channel">✚</span>
+        <label style="display: inline; left: -10px; padding-left: 0">
+          <input id="enableAutoQuality" type="checkbox" style="top: -6px;">
+          Prefer following quality (<span class="italic">if available</span>)
         </label>
+        <select id="autoQuality">
+          <option>1080p</option>
+          <option>720p</option>
+          <option>480p</option>
+          <option>360p</option>
+          <option>240p</option>
+        </select>
+        <span class="stay-on-channel">✚</span>
       </li>
-      -->
     </ul>
   </fieldset>
 

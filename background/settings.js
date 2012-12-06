@@ -6,9 +6,10 @@ var settings = (function(localStorage) {
     jumpToPlayer: true,
     autoPlayJumpToPlayer: true,
     rightClickRedirect: false,
-    skipBrokenVideos: true
+    skipBrokenVideos: true,
+    enableAutoQuality: false,
+    autoQuality: 720
     //extendPlaylist: true,
-    //autoQuality: [1080, 720, 480, 360, 240]
   }, activeSettings = {};
 
   for (var key in defaults) {
