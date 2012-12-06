@@ -15,7 +15,7 @@
   });
 
   function initialize() {
-    if (!(document.querySelector('#page.channel') || document.querySelector('#page.playlist')) || document.querySelector('.comment-post')) {
+    if (!(document.querySelector('#page.channel') || !!document.querySelector('#page.playlist')) || !!document.querySelector('.comment-post')) {
       // this is no channel/playlist; abort!
       return;
     }

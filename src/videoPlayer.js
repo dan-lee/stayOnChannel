@@ -82,6 +82,7 @@ var videoPlayer = {
               onStateChange: self.playerStateChange
             }
           });
+          return player;
         },
 
         getPlayer: function() {
@@ -132,35 +133,32 @@ var videoPlayer = {
     console.log('Creating player...');
     var self = this;
 
-    getVideoInfo(videoId, function(info) {
-      var selector, customClass = '';
+    var selector, customClass = '';
 
-      switch(self.channelType) {
-        case ChannelTypes.FEATURED:
-          selector = '.playlist-info';
-          customClass = 'soc_channel-module';
-          break;
-        case ChannelTypes.FEED:
-          selector = '.yt-horizontal-rule.channel-section-hr';
-          customClass = 'soc_channel-module-margin';
-          break;
-        case ChannelTypes.PLAYLIST:
-          selector = '#playlist-actions';
-          break;
-      }
-      var appendTo = document.querySelector(selector);
+    switch(self.channelType) {
+      case ChannelTypes.FEATURED:
+        selector = '.playlist-info';
+        customClass = 'soc_channel-module';
+        break;
+      case ChannelTypes.FEED:
+        selector = '.yt-horizontal-rule.channel-section-hr';
+        customClass = 'soc_channel-module-margin';
+        break;
+      case ChannelTypes.PLAYLIST:
+        selector = '#playlist-actions';
+        break;
+    }
+    var appendTo = document.querySelector(selector);
 
-      info.playerId = 'movie_player';
-      info.customClass = customClass;
-
-      var playerTemplate = new Template();
-      playerTemplate.loadContent(chrome.extension.getURL('src/resources/player.html'), function() {
-        this.setVars(info);
-        appendTo.outerHTML += playerTemplate.get();
-        self.player = document.getElementById(info.playerId);
-        self.calculateOffset();
-        self.replaceVideo(videoId);
+    var playerTemplate = new Template();
+    playerTemplate.loadContent(chrome.extension.getURL('src/resources/player.html'), function() {
+      playerTemplate.setVars({
+        playerId: 'movie_player'
       });
+      appendTo.outerHTML += playerTemplate.get();
+      self.player = document.getElementById('movie_player');
+      self.replaceVideo(videoId);
+      self.calculateOffset();
     });
   },
 
