@@ -42,16 +42,28 @@
   }
 
   document.addEventListener('playNext', playNextVideo);
+  document.addEventListener('playPrev', playPrevVideo);
+
+  function playPrevVideo() {
+    if (activeVideoIndex >= 0) {
+      var link = videoLinks[activeVideoIndex--];
+      videoPlayer.replaceVideo(getQueryParam('v', link));
+      settings.autoPlayJumpToPlayer && videoPlayer.jumpTo();
+    }
+  }
 
   function playNextVideo() {
     if (settings.autoPlay) {
       var next = getNextVideo();
+      // if there's a following video in the channel list
       if (next) {
         activeVideoIndex = next.indexId;
         videoPlayer.replaceVideo(next.videoId);
         settings.autoPlayJumpToPlayer && videoPlayer.jumpTo();
       } else {
+        // if there's no more video to play check if there's a load more button
         if (registerLoadMoreButton()) {
+          // and trigger a click
           var evt = document.createEvent('MouseEvents');
           evt.initEvent('click', true, true);
           loadMoreButton.dispatchEvent(evt);

@@ -1,7 +1,7 @@
 {
   "description": "Do you want the old YouTube channel behaviour back? By clicking on a video on a channel you will stay there without redirect.",
   "name":        "YouTube™ Stay On Channel",
-  "version":     "1.5",
+  "version":     "1.6",
   "manifest_version": 2,
   "permissions": [
     "tabs",
@@ -21,7 +21,8 @@
       "src/stayOnChannel.js"
     ],
     "css": [
-      "src/style.css"
+      "src/style.css",
+      "src/control.css"
     ],
     "run_at": "document_end"
   }],

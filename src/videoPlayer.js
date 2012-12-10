@@ -5,6 +5,7 @@ var videoPlayer = {
   timeout: 15,
   timedOut: false,
   channelType: null,
+  hasControl: false,
   maxConsecutiveErrors: 5,
 
   init: function(channelType) {
@@ -29,14 +30,17 @@ var videoPlayer = {
         autoQuality = '[[autoQuality]]',
         errors = 0;
 
-      var evt = document.createEvent('Event');
-      evt.initEvent('playNext', true, false);
+      var nextEvent = document.createEvent('Event');
+      nextEvent.initEvent('playNext', true, false);
+
+      var prevEvent = document.createEvent('Event');
+      prevEvent.initEvent('playPrev', true, false);
 
       return {
         // notify the content script
         playerStateChange: function(e) {
           if (e.data == YT.PlayerState.ENDED && playNext) {
-            document.dispatchEvent(evt);
+            document.dispatchEvent(nextEvent);
           }
         },
 
@@ -47,7 +51,7 @@ var videoPlayer = {
 
         onError: function(code) {
           if (++errors < [[maxErrors]]) {
-            autoPlay && document.dispatchEvent(evt);
+            autoPlay && document.dispatchEvent(nextEvent);
           } else {
             alert('Autoplay aborted due too much consecutive unplayable videos.')
           }
@@ -87,6 +91,14 @@ var videoPlayer = {
 
         getPlayer: function() {
           return player;
+        },
+
+        playNext: function() {
+          document.dispatchEvent(nextEvent);
+        },
+
+        playPrev: function() {
+          document.dispatchEvent(prevEvent);
         }
       };
     }) + ')();';
@@ -100,6 +112,33 @@ var videoPlayer = {
       maxErrors: this.maxConsecutiveErrors
     });
     injectJavaScript(inject.get());
+  },
+
+  injectControl: function() {
+    if (!this.hasControl) {
+      this.hasControl = true;
+      return;
+    }
+    var code = '(' +function() {
+      var control = document.createElement('div');
+      control.id = 'stayOnChannel-control';
+      control.innerHTML = '<ul><li id="soc-play-pause">Play/pause</li><li id="soc-next">Next</li><li id="soc-prev">Previous</li><li id="soc-jump">To top/last</li></ul>';
+      document.body.appendChild(control);
+
+      document.getElementById('soc-play-pause').addEventListener('click', function() {
+        var p = StayOnChannel.getPlayer();
+        p.getPlayerState() == YT.PlayerState.PAUSED || YT.PlayerState.STOPPED ? p.playVideo(): p.pauseVideo();
+      });
+
+      document.getElementById('soc-next').addEventListener('click', function() {
+        StayOnChannel.playNext();
+      });
+
+      document.getElementById('soc-prev').addEventListener('click', function() {
+        StayOnChannel.playPrev();
+      });
+    }+ ')();';
+    injectJavaScript(code);
   },
 
   getSuggestedQuality: function() {
@@ -188,6 +227,8 @@ var videoPlayer = {
 
   replaceVideo: function(videoId) {
     this.onReady(function() {
+      this.injectControl();
+
       var tempDiv = document.createElement('div');
       tempDiv.id = this.player.id;
       this.player.parentNode.replaceChild(tempDiv, this.player);
