@@ -1,3 +1,7 @@
+### :warning: *No longer maintained* :warning:
+
+=============
+
 [YouTube™ Stay On Channel](http://tiny.cc/stayOnChannel)
 =============
 
